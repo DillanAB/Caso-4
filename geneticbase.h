@@ -1,5 +1,7 @@
 #ifndef _GENETICBASE_
 #define _GENETICBASE_ 1
+#define AREA 200
+#define PERCENTAGE 0.60
 #include <vector>
 #include "lib/cromodistribution.h"
 #include "lib/individual.h"
@@ -8,7 +10,7 @@ using namespace std;
 
 class GeneticBase {
     private:
-        vector<cromodistribution*> *representation; //Cromo distribution es un struc localizado en lib
+        vector<cromodistribution> representation; //Cromo distribution es un struc localizado en lib
         vector<individual*> *population;
         vector<individual*> *fitnessPopulation;
         vector<individual*> *unfitnessPopulation;
@@ -19,29 +21,57 @@ class GeneticBase {
         void evaluateFitness() {
             fitnessPopulation->clear();
             unfitnessPopulation->clear();
-
+            
+            //Se recorre la población.
+            cout<<"Los que tengo: "<<endl; 
             for(int i=0;i<population->size(); i++) {
-                //Population at tiene individuos y cada individuo 
-                //Tiene un fitness
-               population->at(i)->setFitnessValue(fitness(population->at(i))); //Se le setea el fitness
-
-                //Aquí aparece un 50, pero no puede ser. Nunca debe ser un absoluto
-                //Hay que cambiar este valor.
-                if (population->at(i)->getFitnessValue()>50) {  // fitness criteria of selection never will be an absolute value always is relative to the population
-                    fitnessPopulation->push_back(population->at(i));
-                } else {
-                    unfitnessPopulation->push_back(population->at(i));
+               population->at(i)->setFitnessValue(fitness(population->at(i), population, i));
+               cout<<"Fitness: "<<population->at(i)->getFitnessValue()<<endl;
+            }
+            sortingPopulation(population); //Ordena de menor a mayor
+            cout<<"Los que quedan: "<<endl;
+            //Nos quedamos con el 40% más altos
+            for(int i= (population->size()* PERCENTAGE);i < population->size(); i++) {
+                fitnessPopulation->push_back(population->at(i));
+               cout<<"Fitness: "<<population->at(i)->getFitnessValue()<<endl;
+            }
+        }
+        void sortingPopulation(vector<individual*> *pList){
+            for( int i = 0; i < pList->size(); i++ ){
+            bool insert = false;
+                for( int j = 0; j < i && !insert; j++ ){
+                    if( pList->at(j)->getFitnessValue() >= pList->at(i)->getFitnessValue()){
+                    individual *temp = pList->at(i);
+                    // Mover todos los elementos desde "j" hasta "i-1" una pos. a la derecha
+                    for( int k = i; k >= j+1; k-- ){
+                        pList->at(k) = pList->at(k-1);
+                    }
+                    // Reemplazamos el elemento: colocamos el elemento "i" en la posición de "j"
+                    pList->at(j) = temp;
+                    insert = true;
                 }
             }
         }
-
-        float fitness(individual *pIndividual) {
-            //Aqui se debe pensar más
-            //No puede ser un randon nada màs
-            //Esta funcion tiene la responsabilidad de guiar la poblacion
-            //pues es la que selecciona los mejores dado que esos
-            //están cada vez más cerca de la respuesta
-            return rand()%100;
+        //return pList;
+    }
+        //Selecciona los que están más cerca de la respuesta
+        float fitness(individual *pIndividual, vector<individual*> *pPopulation, int pControl) {
+            int xInitial, yInitial;
+            int xMin = pIndividual->getDistribution().xMin;
+            int yMin = pIndividual->getDistribution().yMin;
+            //cout<<"LOS X: "<<xMin<< " y: "<<yMin<<endl;
+            float distance = 0; float result = 0;
+            for(int indexControl = 0; indexControl < population->size(); indexControl ++){
+                if(indexControl != pControl){
+                    xInitial = population->at(indexControl)->getDistribution().xMin;
+                    yInitial = population->at(indexControl)->getDistribution().yMin;
+                    distance = (sqrt(pow(xInitial-xMin,2) + pow(yInitial-yMin,2)))/AREA;
+                    result += 1/distance;
+                    //cout<<"Distance: "<<result<<endl;
+                }
+         
+            }
+            return distance;
         }
 
         void reproduce(int pAmountOfChildrens) {
@@ -73,15 +103,15 @@ class GeneticBase {
             //Aqui se explica en pizzara 11000100 
             int cut_position = (rand() % (NIBBLE_SIZE-MIN_GENOTYPE_SIZE_BY_PARENT*2)) + MIN_GENOTYPE_SIZE_BY_PARENT;
 
-            unsigned char mask_a = CROMO_MAX_VALUE - 1; // 255 -> 11111111
+            unsigned int mask_a = CROMO_MAX_VALUE - 1; // 255 -> 11111111
             mask_a <<= cut_position;
             //Lo corro la cantidad a la izquierda
 
-            unsigned char mask_b = CROMO_MAX_VALUE - 1; // 255 -> 11111111
+            unsigned int mask_b = CROMO_MAX_VALUE - 1; // 255 -> 11111111
             mask_b >>= NIBBLE_SIZE - cut_position;
             //Corre para la derecha
 
-            unsigned char kid = (pParent_a->getCromosoma() & mask_a) | (pParent_b->getCromosoma() & mask_b);
+            unsigned int kid = (pParent_a->getCromosoma() & mask_a) | (pParent_b->getCromosoma() & mask_b);
 
             individual *children = new individual(kid);
 
@@ -94,28 +124,35 @@ class GeneticBase {
             this->population = new vector<individual*>();
             this->fitnessPopulation = new vector<individual*>();
             this->unfitnessPopulation = new vector<individual*>();
-            this->representation = new vector<cromodistribution*>(); 
+            //this->representation; 
             this->populationQuantity = 0;
             this->targetGenerations = 20;
         }
 
-        void addDistribution(cromodistribution* pDistribution) {
-            representation->push_back(pDistribution);
+        void addDistribution(cromodistribution pDistribution) {
+            representation.push_back(pDistribution);
+        }
+
+        cromodistribution findDistribution(int pValue){
+            
+            cromodistribution distribution;
+            for(int i = 0; i < representation.size();i++){
+                if(pValue > representation[i].minValue && pValue <= representation[i].maxValue){
+                    distribution = representation[i];
+                }
+            }
+            return distribution;
         }
 
         void initPopulation(int pAmountOfIndividuals) {
             population->clear();
-            //Aquí se debe ajustar
-            //Se está asumiendo nibble de 8 bits unsigned char
-            //Si mi individuo es de otro tamaño se debe cambiar
-            //En individuo. El cromososa es de tipo unsigned char
+            cromodistribution distribution;
+
             for(int i=0; i<pAmountOfIndividuals; i++) {
-                individual* p = new individual((unsigned char) rand()%CROMO_MAX_VALUE);
-                //El cromo max value es hasta el 256, se crea un random de ese numero
-                //Por ejemplo si cae en 90 queda en ojos azules
-                //Si cae en 240 sería ojos verdes 
+                individual* p = new individual((unsigned int) rand()%CROMO_MAX_VALUE);
+                distribution = findDistribution((int)p->getCromosoma());
+                p->setDistribution(distribution);
                 population->push_back(p);
-                //Ese individuo se mete en la población actual.
                 
             }
         }
@@ -125,7 +162,7 @@ class GeneticBase {
             for(int i=0; i<ptargetGenerations; i++) {
                 //Qué hace evaluateFitness
                 evaluateFitness(); //Ya queda en una lista los que están fitness y los que no
-                reproduce(pChildrensPerGenerations); //Se le dice que reproduzca esa catidad de "niños"
+                //reproduce(pChildrensPerGenerations); //Se le dice que reproduzca esa catidad de "niños"
             }
         }
 
@@ -134,7 +171,7 @@ class GeneticBase {
         }
 
         int getRepresentationSize(){
-            return representation->size();
+            return representation.size();
         }
 };
 
