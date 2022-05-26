@@ -56,10 +56,22 @@ class TableRow {
         float percentage = 0.0;
         int currentAmount = 0; //Actual
         int actualAmount = 0; //Real
+        //Para el control de colores
+        int darkGrayRange = 180;
+        vector<int> darkGrayColor;
+        vector<int> lightGrayColor;
+        int controlDarkGray = 0;
+        int controlLightGray = 0;
 
     public:
 
         TableRow(){};
+        void setControlDarkGray(int pColor){
+            controlDarkGray += pColor;
+        }
+        void setControlLightGray(int pColor){
+            controlLightGray += pColor;
+        }
         void setCurrentAmount(int pCurrent){
             currentAmount += pCurrent;
         }
@@ -123,7 +135,22 @@ class TableRow {
         int getVectorSize(){
             return pixelVector.size();
         }
-
+        int getDarkGrayRange(){
+            return darkGrayRange;
+        }
+        vector<int> getDarkGrayColor(){
+            return darkGrayColor;
+        }
+        vector<int> getLightGrayColor(){
+            return lightGrayColor;
+        }
+        int getControlDarkGray(){
+            return controlDarkGray;
+        }
+        int getControlLightGray(){
+            return controlLightGray;
+        }
+        
 };
 
 #endif

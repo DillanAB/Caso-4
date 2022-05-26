@@ -132,6 +132,10 @@ class GeneticBase {
         vector<individual*> getPopulation() {
             return *this->population;
         }
+
+        int getRepresentationSize(){
+            return representation->size();
+        }
 };
 
 #endif
