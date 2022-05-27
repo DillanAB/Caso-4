@@ -1,6 +1,10 @@
 #ifndef _DYNAMICTABLE_
 #define _DYNAMICTABLE_ 
 
+#include <iostream>
+#include <vector>
+using namespace std;
+
 class Pixel {
     private:
         int position[2] = {0,0};
@@ -151,6 +155,11 @@ class TableRow {
             return controlLightGray;
         }
         
+};
+
+struct Gray{
+    int darkRed = 89; int darkGreen = 93; int darkBlue = 100;
+    int light = 205;
 };
 
 #endif
