@@ -138,7 +138,7 @@ cromodistribution createNewCromo(TableRow pRow, int pNum, int pMinValue, float p
     if(pNum == 1){
         cromo.quantity = pRow.getControlDarkGray();
         cromo.red = color.darkRed; cromo.green = color.darkGreen; cromo.blue = color.darkBlue; 
-        cout<<"RED: "<<cromo.red<<endl;
+        //cout<<"RED: "<<cromo.red<<endl;
     }else{
         cromo.quantity = pRow.getControlLightGray();
         cromo.red = color.light; cromo.green = color.light; cromo.blue = color.light;
@@ -160,6 +160,9 @@ GeneticBase addCromodistribution(vector<TableRow> pTable){
     int maxNibble = 0;
 
     for(int indexCromo = (NUMBER_OF_QUADRANT*CONTROL_PORCENTAGE_CROMO); indexCromo < NUMBER_OF_QUADRANT; indexCromo++){
+        if(pTable[indexCromo].getControlDarkGray() == 0){
+            continue;
+        }
 
         if(pTable[indexCromo].getControlDarkGray() > pTable[indexCromo].getControlLightGray()){
             distribution = createNewCromo(pTable[indexCromo],1,maxNibble,totalPopulation);
@@ -240,4 +243,4 @@ vector<TableRow> samplingFunction(){
 }
 
 
-#endif;
+#endif

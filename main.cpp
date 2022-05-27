@@ -11,14 +11,14 @@ int main() {
     srand((unsigned char) time(0));
     GeneticBase genetic;
     genetic = addCromodistribution(samplingFunction()); 
-    genetic.initPopulation(10);
-    genetic.produceGenerations(1,100); //(pGeneraciones, pCantHijos)
+    genetic.initPopulation(2000);
+    genetic.produceGenerations(10,2000); //(pGeneraciones, pCantHijos)
 
     vector<individual*> generation = genetic.getPopulation();
     //vector<individual*> generation = genetic.getFitnessPopulation();
-    for (int i = 0; i < generation.size(); i++){
+    /*for (int i = 0; i < generation.size(); i++){
         generation.at(i)->getDistribution().printInfo(); 
-    }
+    }*/
     socketclient client;
     client.init();
     client.clear();

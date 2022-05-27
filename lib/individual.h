@@ -9,7 +9,7 @@ class individual {
         // decide the size of your nibble for your problem
         float fitnessValue;
         unsigned int cromosoma;
-        int xPosition, yPosition;
+        int xInitial, yInitial, xFinal, yFinal;
         cromodistribution distribution;
     public:
         individual(unsigned int pValue) {
@@ -32,8 +32,32 @@ class individual {
             this->distribution = pDistribution;
         }
 
+        void setPointsFromDistri(){
+            this->xInitial = rand() % (distribution.xMax - distribution.xMin) + distribution.xMin;
+			this->yInitial = rand() % (distribution.yMax - distribution.yMin) + distribution.yMin;
+            this->xFinal = rand() % (distribution.xMax - xInitial) + xInitial;
+			this->yFinal = rand() % (distribution.yMax - yInitial) + yInitial;
+        }
+
+        void setPoints(int pXInitial, int pYInitial, int pXFinal, int pYFinal){
+            this->xInitial = pXInitial;
+			this->yInitial = pYInitial;
+            this->xFinal = pXFinal;
+			this->yFinal = pYFinal;
+        }
+
         cromodistribution getDistribution(){
             return this->distribution;
+        }
+        
+        vector<int> getInitialPoints(){
+            vector<int> initialPoints = {xInitial, yInitial};
+            return initialPoints;
+        }
+
+         vector<int> getFinalPoints(){
+            vector<int> finalPoints = {xFinal, yFinal};
+            return finalPoints;
         }
 };
 

@@ -10,7 +10,6 @@
 
 
 //#include "../fitnessProcess.hpp"
-//f
 #define IP_ADDRESS "127.0.0.1"
 //#define IP_ADDRESS "192.168.18.16"
 #define PORT 4000
@@ -99,19 +98,19 @@ class socketclient {
 			//srand((unsigned char) time(0));
 			int sizeOfPoint = 0;
 			for(int i=0; i<generation->size(); i++){
-				//srand((unsigned char) time(0));
+				individual * indi = generation->at(i);
 				cromodistribution distri = generation->at(i)->getDistribution();
-				int xInitial = rand() % (distri.xMax - distri.xMin) + distri.xMin;
-				int yInitial = rand() % (distri.yMax - distri.yMin) + distri.yMin;
+
+				int xInit = indi->getInitialPoints().at(0);
+				int yInit = indi->getInitialPoints().at(1);
+				int xFinal = indi->getFinalPoints().at(0);
+				int yFinal = indi->getFinalPoints().at(1);
 
 				if(distri.shape=="dot"){
-					sizeOfPoint=5;
-					paintDot(distri.red, distri.green, distri.blue, 255, xInitial, yInitial, sizeOfPoint);
+					sizeOfPoint=(xFinal-xInit)+1;
+					paintDot(distri.red, distri.green, distri.blue, 255, xInit, yInit, sizeOfPoint);
 				}else{
-					int xFinal = rand() % (distri.xMax - xInitial) + xInitial;
-					int yFinal = rand() % (distri.yMax - yInitial) + yInitial;
-					cout<<"RED: "<<distri.red<<endl;
-					paintLine(distri.red, distri.green, distri.blue, 255, xInitial, yInitial, xFinal, yFinal);
+					paintLine(distri.red, distri.green, distri.blue, 255, xInit, yInit, xFinal, yFinal);
 				}
 			}
 		}
@@ -120,17 +119,3 @@ class socketclient {
 			closesocket(sock);
 		}
 };
-
-/*int main(){
-    socketclient client;
-    client.init();
-
-    client.clear();
-    client.paintLine(70, 80, 50, 100, 300, 100, 400, 600);
-    client.paintDot(200, 0, 15, 200, 500, 600, 15);
-    client.paintDot(220, 150, 15, 200, 600, 600, 20);
-	client.paintLine(200, 1, 1, 50, 50, 500, 20, 350);
-
-    client.closeConnection();
-	return 0;
-}*/

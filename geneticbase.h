@@ -28,7 +28,7 @@ class GeneticBase {
             unfitnessPopulation->clear();
             
             //Se recorre la población.
-            cout<<"Los que tengo: "<<endl; 
+            //cout<<"Los que tengo: "<<endl; 
             for(int i=0;i<population->size(); i++) {
                 population->at(i)->setFitnessValue(fitness(population->at(i)));
             }
@@ -57,14 +57,13 @@ class GeneticBase {
             }
         }
         //return pList;
-    }
+
         //Selecciona los que están más cerca de la respuesta
         float fitness(individual *pIndividual) {
             Pivot points;
-            int xMin = pIndividual->getDistribution().xMin;
-            int yMin = pIndividual->getDistribution().yMin;
+            int xMin = pIndividual->getInitialPoints().at(0);
+            int yMin = pIndividual->getInitialPoints().at(1);
             float distance = 0; float result = 0;
-
             for(int indexControl = 0; indexControl < points.quantity; indexControl += 2){
                 distance += 1/((sqrt(pow(points.pivot[indexControl]-xMin,2) + pow(points.pivot[indexControl+1]-yMin,2)))/(AREA*AREA)); 
             }
@@ -100,7 +99,7 @@ class GeneticBase {
             individual *children = new individual(kid);
             cromodistribution distribution = findDistribution((int)children->getCromosoma());
             children->setDistribution(distribution);
-
+            children->setPointsFromDistri();
             //Hace falta la mutación. Agregar el % de mutación y la mutación
             float mutationChance = (rand() % 100);
             if(mutationChance<MUTATION_RATIO){
@@ -141,13 +140,14 @@ class GeneticBase {
                 individual* p = new individual((unsigned int) rand()%CROMO_MAX_VALUE);
                 distribution = findDistribution((int)p->getCromosoma());
                 p->setDistribution(distribution);
+                p->setPointsFromDistri();
                 population->push_back(p);
             }
         }
         
         void produceGenerations(int ptargetGenerations, int pChildrensPerGenerations) {
             for(int i=0; i<ptargetGenerations; i++) {
-                cout<<"INICIA GEN"<<endl;
+                cout<<"Inicia una gen:"<<endl;
                 evaluateFitness(); 
                 reproduce(pChildrensPerGenerations); 
             }
@@ -169,6 +169,5 @@ class GeneticBase {
             return this->representation;
         }
 };
-
 
 #endif
