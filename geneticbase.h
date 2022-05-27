@@ -2,7 +2,7 @@
 #define _GENETICBASE_ 1
 #define AREA 200 
 #define PERCENTAGE 0.40
-#define MUTATION_RATIO 7
+#define MUTATION_RATIO 5
 #include <vector>
 #include "lib/cromodistribution.h"
 #include "lib/individual.h"
@@ -103,7 +103,9 @@ class GeneticBase {
             //Hace falta la mutación. Agregar el % de mutación y la mutación
             float mutationChance = (rand() % 100);
             if(mutationChance<MUTATION_RATIO){
-                //rand()
+               //int bitToMutate = rand() % NIBBLE_SIZE;
+               //unsigned int cromoMutated = children->getCromosoma();//.binary_code[bitToMutate] ^= 1;
+               //cromoMutated.binary_code[bitToMutate] ^= 1;
             }
             return children;
         }
@@ -147,7 +149,7 @@ class GeneticBase {
         
         void produceGenerations(int ptargetGenerations, int pChildrensPerGenerations) {
             for(int i=0; i<ptargetGenerations; i++) {
-                cout<<"Inicia una gen:"<<endl;
+                cout<<"Inicia una gen"<<endl;
                 evaluateFitness(); 
                 reproduce(pChildrensPerGenerations); 
             }

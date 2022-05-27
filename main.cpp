@@ -22,6 +22,7 @@ int main() {
     socketclient client;
     client.init();
     client.clear();
+    cout<<"Inicia a pintar"<<endl;
     client.drawGeneration(&generation);
     client.closeConnection();
     

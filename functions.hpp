@@ -38,18 +38,25 @@ It has as parameters: A vector of rows / quadrants and an index.
 What it returns is the index of the table where the highest percentage is
 */
 
-int findPercentage(vector<TableRow> pTable, int indexControl){
-    float max = 0; 
+int findPercentage(vector<TableRow> pTable, int indexControl, int pNumOfNotVisited){
+    int returnIndex;
+    if (pNumOfNotVisited >= (int) (NUMBER_OF_QUADRANT/10)){ 
+        returnIndex = rand()%NUMBER_OF_QUADRANT;
+        return returnIndex;
+    }
 
+    float random = (float)(rand()) / ((float)(RAND_MAX/(1)));
+    //float max = 0; 
     for(int indexTable = 0; indexTable < pTable.size(); indexTable++){
-        if(pTable[indexTable].getPercentage() > max && indexTable != indexControl){
-            max = indexTable;
+        if(pTable[indexTable].getPercentage() > random && indexTable != indexControl){
+            //cout<<"Entra por porcentaje"<<endl;
+            returnIndex = indexTable;
+        }
+        if(indexTable >= pTable.size()-1){
+            return rand()%NUMBER_OF_QUADRANT;
         }
     }
-    if (pTable[max].getPercentage() == 0){ 
-        max = rand()%NUMBER_OF_QUADRANT;
-    }
-    return max;
+    return returnIndex;
 }
 
 /*
@@ -189,7 +196,7 @@ anyway it counts. The percentage decreases considerably if that quadrant already
 15% of the total number of pixels in that quadrant were visited.
 */
 vector<TableRow> samplingFunction(){
-
+    int numOfNotVisited = NUMBER_OF_QUADRANT;
     vector<TableRow> pTable = createTable(); //Create quadrants
 
     //Load and read the image
@@ -205,8 +212,12 @@ vector<TableRow> samplingFunction(){
     
     for(int pixelIndex = 0; pixelIndex < TOTAL_PIXELS; pixelIndex++){
 
-        rowHighestPercentage = findPercentage(pTable,indexControl);
+        rowHighestPercentage = findPercentage(pTable,indexControl, numOfNotVisited);
         indexControl = rowHighestPercentage; //So that it does not repeat, the same pixel in the next run
+        if(pTable[indexControl].getVisited()==false){
+            --numOfNotVisited;
+            pTable[indexControl].setVisited(true);
+        }
 
         //Create the pixel and add its color
         pixel = createNewPixel(pTable[rowHighestPercentage]);
@@ -218,7 +229,6 @@ vector<TableRow> samplingFunction(){
         //Assign the current value and the real value of the quadrant to the variables
         currenyAmount = pTable[rowHighestPercentage].getCurrentAmount(); 
         actualAmount = pTable[rowHighestPercentage].getActualAmount(); 
-    
         //Compare if the pixel color is among the darkest grays. If it is.
         //Increase percentage if not, decrease it
         if(isInRange(red,green,blue)){
@@ -233,9 +243,8 @@ vector<TableRow> samplingFunction(){
             pTable[rowHighestPercentage].setControlLightGray(1);
             pTable[rowHighestPercentage].setCurrentAmount(-1);
         }
-
         pTable[rowHighestPercentage].setActualAmount(1); //Increase real
-        percentage = pTable[rowHighestPercentage].getCurrentAmount()/TOTAL_PIXELS;
+        percentage = pTable[rowHighestPercentage].getCurrentAmount()/TOTAL_PIXELS; //ANTES ESTABA ENTRE TOTAL PIXELS.
         pTable[rowHighestPercentage].setPercentage(percentage);
         pTable[rowHighestPercentage].setPixelVector(pixel);
     }

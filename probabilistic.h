@@ -51,7 +51,7 @@ class Pixel {
 
 class TableRow {
     private:
-
+        bool visited = false;
         int initialPosition[2] = {0,0};
         int finalPosition[2] = {0,0};
         int range[2] = {0,0};
@@ -153,6 +153,12 @@ class TableRow {
         }
         int getControlLightGray(){
             return controlLightGray;
+        }
+        bool getVisited(){
+            return visited;
+        }
+        void setVisited(bool pBool){
+            visited = pBool;
         }
         
 };
