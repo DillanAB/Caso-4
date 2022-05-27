@@ -10,7 +10,7 @@
 #include <bits/stdc++.h>
 #include <vector>
 
-#define TOTAL_PIXELS  50000.0 //Number of pixels that I want to search for.
+#define TOTAL_PIXELS  30000.0 //Number of pixels that I want to search for.
 #define QUADRANT_QUANTITY 1600 //40 x 40
 #define QUADRANT 40 // Length that each quadrant will have
 #define CONTROLROW 27 //Quadrants x row

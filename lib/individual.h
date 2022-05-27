@@ -32,6 +32,10 @@ class individual {
             this->distribution = pDistribution;
         }
 
+        void setCromosome(unsigned int pCromosome){
+            this->cromosoma = pCromosome;
+        }
+
         void setPointsFromDistri(){
             this->xInitial = rand() % (distribution.xMax - distribution.xMin) + distribution.xMin;
 			this->yInitial = rand() % (distribution.yMax - distribution.yMin) + distribution.yMin;
