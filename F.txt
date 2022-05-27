@@ -27,7 +27,7 @@ class GeneticBase {
             //Se recorre la población.
             cout<<"Los que tengo: "<<endl; 
             for(int i=0;i<population->size(); i++) {
-               population->at(i)->setFitnessValue(fitness(population->at(i)));
+               population->at(i)->setFitnessValue(fitness(population->at(i), population, i));
                cout<<"Fitness: "<<population->at(i)->getFitnessValue()<<endl;
             }
             sortingPopulation(population); //Ordena de menor a mayor
@@ -59,17 +59,23 @@ class GeneticBase {
         //return pList;
     }
         //Selecciona los que están más cerca de la respuesta
-        float fitness(individual *pIndividual) {
-            int pointsOfReference[10] = {540,100,540,250,540,700,200,400,800,400};
+        float fitness(individual *pIndividual, vector<individual*> *pPopulation, int pControl) {
+            int xInitial, yInitial;
             int xMin = pIndividual->getDistribution().xMin;
             int yMin = pIndividual->getDistribution().yMin;
             //cout<<"LOS X: "<<xMin<< " y: "<<yMin<<endl;
-            float distance = 0;
-            int nex = 0;
-            for(int indexControl = 0; indexControl < 9; indexControl += 2){
-                distance += 1/((sqrt(pow(pointsOfReference[indexControl]-xMin,2) + pow(pointsOfReference[indexControl+1]-yMin,2)))/AREA); 
+            double distance = 0; double result = 0;
+            for(int indexControl = 0; indexControl < population->size(); indexControl ++){
+                if(indexControl != pControl){
+                    xInitial = population->at(indexControl)->getDistribution().xMin;
+                    yInitial = population->at(indexControl)->getDistribution().yMin;
+                    distance = (sqrt(pow(xInitial-xMin,2) + pow(yInitial-yMin,2)))/AREA;
+                    result += distance;
+                    //cout<<"Distance: "<<result<<endl;
+                }
+         
             }
-            return distance;
+            return result;
         }
 
         void reproduce(int pAmountOfChildrens) {

@@ -1,19 +1,26 @@
 #ifndef _CROMODISTRIBUTION_
 #define _CROMODISTRIBUTION_ 1
 
-#define CROMO_MAX_VALUE 256
-#define NIBBLE_SIZE 8 //8 bits 8 a la 8 
-
+#define CROMO_MAX_VALUE 65536
+#define NIBBLE_SIZE 16 //bits
+#include <iostream>
 using namespace std;
 
 struct cromodistribution {
-    string name;
-    int minValue;
-    int maxValue;
-    float minProbability;
-    float maxProbability;
+    int xMin, xMax;
+    int yMin, yMax;
+    int minValue; //Nibble
+    int maxValue; //Nibble
+    int red, green, blue;
+    string shape;
+    float maxProbability; //Porcentaje segun cantidad
     int quantity; //Cantidad que sostengo
-    int totalPopulation; //Para dividirlo entre canti
+    //int * totalPopulation; //Para dividirlo entre canti
+
+    void printInfo(){
+        cout<<"xMin = "<<xMin<<" | yMin = "<<yMin<<" | ";
+        cout<<"minValue = "<<minValue<<" | maxValue = "<<maxValue<<" |"<<endl;
+    }
 };
 
 

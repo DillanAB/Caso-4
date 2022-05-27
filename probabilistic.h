@@ -1,6 +1,10 @@
 #ifndef _DYNAMICTABLE_
 #define _DYNAMICTABLE_ 
 
+#include <iostream>
+#include <vector>
+using namespace std;
+
 class Pixel {
     private:
         int position[2] = {0,0};

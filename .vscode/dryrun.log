@@ -1,0 +1,6 @@
+make.exe --dry-run --keep-going --print-directory
+make.exe: Entering directory 'd:/TEC/Semestre 5/An�lisis de algoritmos/Caso-4'
+g++ main.cpp -o prog.exe -lws2_32
+ 
+make.exe: Leaving directory 'd:/TEC/Semestre 5/An�lisis de algoritmos/Caso-4'
+ 

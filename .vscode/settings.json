@@ -1,0 +1,8 @@
+{
+    "makefile.extensionOutputFolder": "./.vscode",
+    "files.associations": {
+        "*.py": "python",
+        "iostream": "cpp",
+        "vector": "cpp"
+    }
+}

@@ -1,4 +1,3 @@
-#include <bits/stdc++.h>
 #define TOTAL_PIXELS  30000.0 //Cantidad de pixeles que deseo buscar.Colocarle el .0
 #define QUADRANT_QUANTITY 1600 //40 x 40
 #define QUADRANT 40 //Longitud que tendrá cada cuadrante
@@ -7,21 +6,14 @@
 #define RANGE 25 //Rango de color que acepta
 #define IMAGE_NAME "persona_3.jpg"
 #define CONTROL_DARK_GRAY 180
+#define SAMPLERATE 0.15
 
 #define CONTROL_PORCENTAGE_CROMO 0.50
 
 
 #define STB_IMAGE_IMPLEMENTATION
 
-#include "stb_image.h"
-#include <iostream>
-#include "geneticbase.h"
-#include "lib/cromodistribution.h"
-#include <vector>
-#include "lib/individual.h"
-#include "probabilistic.h"
-#include <ctime>
-#include <time.h>
+#include "main.hpp"
 
 using namespace std;
 
@@ -125,9 +117,12 @@ vector<TableRow> sorting( vector<TableRow> pList){
 
 float getTotalPopulation(vector<TableRow> pTable){
     float total = 0;
-    for(int indexTable = NUMBER_OF_QUADRANT * CONTROL_PORCENTAGE_CROMO; indexTable < NUMBER_OF_QUADRANT; indexTable++){
-        total += pTable[indexTable].getControlDarkGray();
-        total += pTable[indexTable].getControlLightGray();
+    for(int indexTable = (NUMBER_OF_QUADRANT * CONTROL_PORCENTAGE_CROMO); indexTable < NUMBER_OF_QUADRANT; indexTable++){
+        if(pTable[indexTable].getControlDarkGray() > pTable[indexTable].getControlLightGray()){
+            total += pTable[indexTable].getControlDarkGray();
+        }else{
+            total += pTable[indexTable].getControlLightGray();
+        }
     }
     return total;
 }
@@ -135,16 +130,12 @@ float getTotalPopulation(vector<TableRow> pTable){
 //Crear la estructura del cromosoma
 cromodistribution createNewCromo(TableRow pRow, int pNum, int pMinValue, float pTotal){
     cromodistribution cromo;
-    int shapeRandom = 1+ rand()% 2;
+    int shapeDensity = 0;
     cromo.xMin = pRow.getInitialPositionOne();
     cromo.xMax = pRow.getInitialPositionTwo();
     cromo.yMin = pRow.getFinalPositionOne();
     cromo.yMax = pRow.getFinalPositionTwo();
-    if(shapeRandom == 1){
-        cromo.shape = "dot";
-    }else{
-        cromo.shape = "line";
-    }
+
     if(pNum == 1){
         cromo.quantity = pRow.getControlDarkGray();
         cromo.red = 89; cromo.green = 93; cromo.blue = 100; //Tratar de cambiar
@@ -152,10 +143,11 @@ cromodistribution createNewCromo(TableRow pRow, int pNum, int pMinValue, float p
         cromo.quantity = pRow.getControlLightGray();
         cromo.red = 205; cromo.green = 205; cromo.blue = 205; //Tratar de cambiar
     }
+    shapeDensity = cromo.quantity / (QUADRANT_QUANTITY * SAMPLERATE);
+    cromo.shape = shapeDensity < 0.60 ? "line" : "dot";
     cromo.maxProbability = (cromo.quantity+0.0)/ pTotal;
     cromo.minValue = pMinValue ;
     cromo.maxValue = (pMinValue +1)+ (CROMO_MAX_VALUE * cromo.maxProbability);
-
     return cromo;
 }
 
@@ -165,30 +157,34 @@ GeneticBase addCromodistribution(vector<TableRow> pTable){
     float totalPopulation= getTotalPopulation(pTable);
     GeneticBase genetic;
     cromodistribution distribution;
-    cromodistribution distribution_;
-
-    vector<cromodistribution> prueba; //Eliminar despues****
+    //cromodistribution distribution_;
+    //vector<cromodistribution> prueba; //Eliminar despues****
 
     int maxNibble = 0;
-    for(int indexCromo = (NUMBER_OF_QUADRANT*CONTROL_PORCENTAGE_CROMO)-2; indexCromo < NUMBER_OF_QUADRANT; indexCromo++){
+    for(int indexCromo = (NUMBER_OF_QUADRANT*CONTROL_PORCENTAGE_CROMO); indexCromo < NUMBER_OF_QUADRANT; indexCromo++){
+        if(pTable[indexCromo].getControlDarkGray() > pTable[indexCromo].getControlLightGray()){
+            distribution = createNewCromo(pTable[indexCromo],1,maxNibble,totalPopulation);
+        }else{
+            distribution = createNewCromo(pTable[indexCromo],2,maxNibble,totalPopulation);
+        }
         //Primer color
-        distribution = createNewCromo(pTable[indexCromo],1,maxNibble,totalPopulation);
-        genetic.addDistribution(&distribution);
+        genetic.addDistribution(distribution); //*******************&***************************
         maxNibble = distribution.maxValue;
-        //Segundo color
-        distribution_ = createNewCromo(pTable[indexCromo],2,maxNibble,totalPopulation);
-        genetic.addDistribution(&distribution_);
-        maxNibble = distribution_.maxValue;
+
+        // //Segundo color
+        // distribution_ = createNewCromo(pTable[indexCromo],2,maxNibble,totalPopulation);
+        // genetic.addDistribution(&distribution_);
+        // maxNibble = distribution_.maxValue;
 
         //Solo prueba, quitar luego
-        prueba.push_back(distribution);
-        prueba.push_back(distribution_);
+        //prueba.push_back(distribution);
+        //prueba.push_back(distribution_);
     }
     //Solo para imprimir  //Se sobrepasa del nibble--falta corregir
-    for(int i = 0; i < prueba.size();i++){
-        cout<<"Cromosoma cantidad: "<< prueba[i].quantity
-        <<" Rango del nibble: "<<prueba[i].minValue<<" "<<prueba[i].maxValue<<endl; 
-    }
+    // for(int i = 0; i < prueba.size();i++){
+    //     cout<<"Cromosoma cantidad: "<< prueba[i].quantity
+    //     <<" Rango del nibble: "<<prueba[i].minValue<<" "<<prueba[i].maxValue<<endl; 
+    // }
     return genetic;
 } 
 
@@ -266,11 +262,36 @@ vector<TableRow> samplingFunction(){
 
 
 int main() {
+    srand((unsigned char) time(0));
+    GeneticBase genetic;
+    genetic = addCromodistribution(samplingFunction()); //Ya se añadió la distribución
+    genetic.initPopulation(1000);
+    genetic.produceGenerations(5,1000); //(pGeneraciones, pCantHijos)
 
-GeneticBase genetic;
-genetic = addCromodistribution(samplingFunction()); //Ya se añadió la distribución
+    vector<individual*> generation = genetic.getPopulation();
+    //vector<individual*> generation = genetic.getFitnessPopulation();
+    for (int i = 0; i < generation.size(); i++){
+        generation.at(i)->getDistribution().printInfo(); 
+    }
+    socketclient client;
+    client.init();
+    client.clear();
+    client.drawGeneration(&generation);
+    client.closeConnection();
+    
 
-//DISTRIBUTION_SIZE = 10;
+
+
+    //cout<<genetic.getPopulation()[0]->getCromosoma()<<endl;
+    //cout<<genetic.getPopulation().size()<<endl;
+    
+    /*
+    client.paintLine(70, 80, 50, 100, 300, 100, 400, 600);
+    client.paintDot(200, 0, 15, 200, 500, 600, 15);
+    client.paintDot(220, 150, 15, 200, 600, 600, 20);
+	client.paintLine(200, 1, 1, 50, 50, 500, 20, 350);*/
+
+    //DISTRIBUTION_SIZE = 10;
     // int red, green, blue;
     // int width, height, channels, indexControl;
     // unsigned char *image = stbi_load(IMAGE_NAME, &width, &height, &channels, 0);
