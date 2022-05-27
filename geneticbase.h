@@ -100,13 +100,22 @@ class GeneticBase {
             cromodistribution distribution = findDistribution((int)children->getCromosoma());
             children->setDistribution(distribution);
             children->setPointsFromDistri();
-            //Hace falta la mutación. Agregar el % de mutación y la mutación
+
+            //Mutation
             float mutationChance = (rand() % 100);
             if(mutationChance<MUTATION_RATIO){
-               //int bitToMutate = rand() % NIBBLE_SIZE;
-               //unsigned int cromoMutated = children->getCromosoma();//.binary_code[bitToMutate] ^= 1;
-               //cromoMutated.binary_code[bitToMutate] ^= 1;
+               int bitToMutate = rand() % (NIBBLE_SIZE - 1);
+               unsigned int cromo = children->getCromosoma();
+               unsigned int mask = 1 << bitToMutate;
+               unsigned int cromoMutated = ((cromo & ~mask) | (1 << bitToMutate));
+               children->setCromosome(cromoMutated);
+               cromodistribution distribution = findDistribution((int)children->getCromosoma());
+            }else{
+                cromodistribution distribution = findDistribution((int)children->getCromosoma());
+                children->setDistribution(distribution);
             }
+            children->setPointsFromDistri();
+
             return children;
         }
 

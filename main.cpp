@@ -11,8 +11,8 @@ int main() {
     srand((unsigned char) time(0));
     GeneticBase genetic;
     genetic = addCromodistribution(samplingFunction()); 
-    genetic.initPopulation(2000);
-    genetic.produceGenerations(10,2000); //(pGeneraciones, pCantHijos)
+    genetic.initPopulation(1000);
+    genetic.produceGenerations(10,1000); //(pGeneraciones, pCantHijos)
 
     vector<individual*> generation = genetic.getPopulation();
     //vector<individual*> generation = genetic.getFitnessPopulation();
