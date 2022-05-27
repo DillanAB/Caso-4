@@ -157,4 +157,9 @@ class TableRow {
         
 };
 
+struct Gray{
+    int darkRed = 89; int darkGreen = 93; int darkBlue = 100;
+    int light = 205;
+};
+
 #endif
